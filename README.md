@@ -13,7 +13,29 @@
 ## 系统要求
 
 - Windows 7/8/10/11
+- [Bun](https://bun.sh/) 运行时
 - Python 3.8+（可选，用于GUI界面）
+
+## 安装
+
+### 1. 安装Bun
+
+```powershell
+powershell -Command "irm bun.sh/install.ps1 | iex"
+```
+
+### 2. 安装依赖
+
+```bash
+bun install
+```
+
+### 3. 复制日语词典（可选）
+
+```bash
+mkdir dict
+cp node_modules/kuromoji/dict/*.dat.gz dict/
+```
 
 ## 使用方法
 
@@ -47,6 +69,8 @@ python cli.py input.srt output.ass
 │   ├── base.dat.gz
 │   ├── tid.dat.gz
 │   └── ...
+└── src/
+    └── user_vocab.json  # 用户自定义词典
 ```
 
 ## 打包为独立exe

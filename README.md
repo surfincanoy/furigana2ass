@@ -13,7 +13,6 @@
 ## 系统要求
 
 - Windows 7/8/10/11
-- [Bun](https://bun.sh/) 运行时
 - Python 3.8+（可选，用于GUI界面）
 
 ## 安装

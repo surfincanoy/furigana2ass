@@ -47,8 +47,6 @@ python cli.py input.srt output.ass
 │   ├── base.dat.gz
 │   ├── tid.dat.gz
 │   └── ...
-└── src/
-    └── user_vocab.json  # 用户自定义词典
 ```
 
 ## 打包为独立exe

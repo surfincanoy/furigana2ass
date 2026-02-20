@@ -152,7 +152,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("用法: python simple_test.py <srt文件> [ass输出文件]")
+        print("用法: python cli.py <srt文件> [ass输出文件]")
         sys.exit(1)
 
     srt_file = sys.argv[1]

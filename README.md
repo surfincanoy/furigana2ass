@@ -30,7 +30,7 @@ powershell -Command "irm bun.sh/install.ps1 | iex"
 bun install
 ```
 
-### 3. 复制日语词典（必需）
+### 3. 复制日语词典（可选）
 
 ```bash
 mkdir dict

@@ -15,27 +15,6 @@
 - Windows 7/8/10/11
 - Python 3.8+（可选，用于GUI界面）
 
-## 安装
-
-### 1. 安装Bun
-
-```powershell
-powershell -Command "irm bun.sh/install.ps1 | iex"
-```
-
-### 2. 安装依赖
-
-```bash
-bun install
-```
-
-### 3. 复制日语词典（可选）
-
-```bash
-mkdir dict
-cp node_modules/kuromoji/dict/*.dat.gz dict/
-```
-
 ## 使用方法
 
 ### 图形界面（推荐）

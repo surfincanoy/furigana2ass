@@ -4,6 +4,12 @@ Electron 桌面工具，提供两个功能：
 - **注音转换**：将 SRT/ASS 字幕转换为 ASS 格式，自动为日文汉字标注振假名（furigana），生成 Aegisub 卡拉 OK 模板
 - **双语合并**：将两个字幕文件按行合并为双语字幕（如中文 + 英文）
 
+<div style="border-left: 4px solid #ffa500; background: #2d2d2d; padding: 10px 16px; color: #ffcc66;">
+
+**注意**：本程序不保证振假名的正确性，如需要更改字幕文本，比如字体大小，纠正振假名错误等，请在应用卡拉 OK 模板前更改。
+
+</div>
+
 ## 前置要求
 
 安装 **Node.js**（>= 18）和 **npm**：
@@ -69,7 +75,7 @@ npx electron-builder --linux deb
 2. 点击「开始转换」
 3. 同目录下生成 `.ass` 文件
 
-生成的 ASS 文件包含两条 Aegisub 模板注释行，可在 Aegisub 中执行卡拉 OK 模板渲染振假名。如需要更改字幕文本的字体大小，在应用卡拉OK模板前更改。
+生成的 ASS 文件包含两条 Aegisub 模板注释行，可在 Aegisub 中执行卡拉 OK 模板渲染振假名。
 
 ### 双语字幕合并
 

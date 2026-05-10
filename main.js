@@ -20,23 +20,20 @@ function srtTimeToAss(srtTime) {
   }
 }
 
-function parseSrt(srtPath) {
+function readFileContent(filePath) {
   const encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252'];
-  let content = null;
-
   for (const enc of encodings) {
     try {
-      content = fs.readFileSync(srtPath, { encoding: enc });
-      break;
+      return fs.readFileSync(filePath, { encoding: enc });
     } catch {
       continue;
     }
   }
+  return fs.readFileSync(filePath, { encoding: 'utf-8', flag: 'r' });
+}
 
-  if (content === null) {
-    content = fs.readFileSync(srtPath, { encoding: 'utf-8', flag: 'r' });
-  }
-
+function parseSrt(filePath) {
+  const content = readFileContent(filePath);
   const lines = content.split(/\r?\n/);
   const blocks = [];
   let i = 0;
@@ -71,6 +68,61 @@ function parseSrt(srtPath) {
   }
 
   return blocks;
+}
+
+function parseAss(filePath) {
+  const content = readFileContent(filePath);
+  const lines = content.split(/\r?\n/);
+  const blocks = [];
+  let inEvents = false;
+  let startIdx = -1;
+  let endIdx = -1;
+  let textIdx = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (line === '[Events]') {
+      inEvents = true;
+      continue;
+    }
+
+    if (!inEvents) continue;
+    if (line.startsWith('[')) break;
+
+    const upper = line.toUpperCase();
+    if (upper.startsWith('FORMAT:')) {
+      const fields = line.slice(7).split(',').map(f => f.trim());
+      startIdx = fields.indexOf('Start');
+      endIdx = fields.indexOf('End');
+      textIdx = fields.indexOf('Text');
+      continue;
+    }
+
+    if (!upper.startsWith('DIALOGUE:')) continue;
+    if (startIdx < 0 || endIdx < 0 || textIdx < 0) continue;
+
+    const parts = line.split(',');
+    if (parts.length <= Math.max(startIdx, endIdx, textIdx)) continue;
+
+    const start = parts[startIdx].trim();
+    const end = parts[endIdx].trim();
+    const text = parts.slice(textIdx).join(',').trim();
+
+    if (start && end) {
+      blocks.push({ start, end, text });
+    }
+  }
+
+  return blocks;
+}
+
+function parseSubtitleFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.ass' || ext === '.ssa') {
+    return parseAss(filePath);
+  }
+  return parseSrt(filePath);
 }
 
 async function toKaraokeRuby(text) {
@@ -144,8 +196,8 @@ let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 500,
-    height: 260,
+    width: 560,
+    height: 520,
     resizable: false,
     autoHideMenuBar: true,
     title: '日语非卡拉OK字幕注音模板生成程序',
@@ -161,8 +213,11 @@ function createWindow() {
 
 ipcMain.handle('select-file', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: '选择SRT文件',
-    filters: [{ name: 'SRT files', extensions: ['srt'] }, { name: 'All files', extensions: ['*'] }],
+    title: '选择字幕文件',
+    filters: [
+      { name: '字幕文件', extensions: ['srt', 'ass', 'ssa'] },
+      { name: 'All files', extensions: ['*'] },
+    ],
     properties: ['openFile'],
   });
 
@@ -170,9 +225,65 @@ ipcMain.handle('select-file', async () => {
   return result.filePaths[0];
 });
 
+ipcMain.handle('select-save-file', async () => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: '保存合并后的字幕',
+    filters: [
+      { name: 'SRT 字幕', extensions: ['srt'] },
+      { name: 'ASS 字幕', extensions: ['ass'] },
+      { name: 'All files', extensions: ['*'] },
+    ],
+    defaultPath: 'merged_subtitle.srt',
+  });
+
+  if (result.canceled || !result.filePath) return null;
+  return result.filePath;
+});
+
+ipcMain.handle('merge-srt', async (_event, { file1, file2, swap, outputPath }) => {
+  try {
+    const blocks1 = parseSubtitleFile(file1);
+    const blocks2 = parseSubtitleFile(file2);
+
+    if (blocks1.length !== blocks2.length) {
+      return {
+        success: false,
+        error: `字幕行数不一致 (${blocks1.length} vs ${blocks2.length})，无法合并`,
+      };
+    }
+
+    const merged = blocks1.map((b, i) => {
+      const text1 = b.text.trim();
+      const text2 = blocks2[i].text.trim();
+      let mergedText;
+      if (swap) {
+        mergedText = text2 + '\\N' + text1;
+      } else {
+        mergedText = text1 + '\\N' + text2;
+      }
+      return {
+        start: b.start,
+        end: b.end,
+        text: mergedText,
+      };
+    });
+
+    const content = merged.map((b, i) => {
+      return `${i + 1}\n${b.start} --> ${b.end}\n${b.text}\n\n`;
+    }).join('');
+
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, content, 'utf-8');
+
+    return { success: true, outputPath, total: merged.length };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 ipcMain.handle('convert-srt', async (_event, srtPath) => {
   try {
-    const blocks = parseSrt(srtPath);
+    const blocks = parseSubtitleFile(srtPath);
     const total = blocks.length;
 
     const results = await Promise.all(blocks.map(b => toKaraokeRuby(b.text)));
@@ -180,7 +291,7 @@ ipcMain.handle('convert-srt', async (_event, srtPath) => {
       blocks[idx].text = results[idx];
     }
 
-    const assPath = srtPath.replace(/\.srt$/i, '.ass');
+    const assPath = srtPath.replace(/\.(srt|ass|ssa)$/i, '.ass');
     convertSrtToAss(srtPath, assPath, blocks);
 
     return { success: true, assPath, total };

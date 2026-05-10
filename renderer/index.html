@@ -1,1 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>日语非卡拉OK字幕注音模板生成程序</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="input-row">
+      <input type="text" id="srtPath" class="srt-input" placeholder="请选择SRT文件" readonly>
+      <button id="selectBtn" class="btn btn-select">文件选择</button>
+    </div>
 
+    <div class="status-area" id="statusArea">
+      <span id="statusText">就绪</span>
+    </div>
+
+    <button id="convertBtn" class="btn btn-convert">开始转换</button>
+
+    <div class="footer">
+      <span class="author">作者B站：水橙汁</span>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

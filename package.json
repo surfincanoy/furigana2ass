@@ -1,0 +1,50 @@
+{
+  "name": "ass-rs",
+  "version": "2.0.0",
+  "description": "日语字幕振假名生成器",
+  "author": "srt2-furigana <srt2@example.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/example/srt2-furigana",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build:win": "electron-builder --win",
+    "build:deb": "electron-builder --linux deb",
+    "build:all": "electron-builder --win --linux"
+  },
+  "build": {
+    "appId": "com.ass-rs.app",
+    "productName": "日语振假名生成器",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.cjs",
+      "renderer/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "日语振假名生成器"
+    },
+    "linux": {
+      "target": "deb",
+      "category": "Utility"
+    }
+  },
+  "dependencies": {
+    "kuroshiro": "^1.2.0",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0"
+  },
+  "devDependencies": {
+    "electron": "^42.0.1",
+    "electron-builder": "^26.0.0"
+  }
+}

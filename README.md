@@ -1,113 +1,127 @@
-# 日语振假名生成器
+# 日语字幕振假名生成器
 
-将SRT字幕文件转换为带振假名标注的ASS字幕文件。
+将 SRT 字幕文件转换为 ASS 格式，自动为日文汉字标注振假名。
 
-## 功能特点
+## 前置要求
 
-- 📝 支持SRT字幕文件输入
-- 🎯 自动识别日语汉字并添加振假名
-- 🎨 输出标准ASS格式字幕
-- 🖥️ 图形界面，操作简单
-- 🚀 使用Bun + kuromoji进行高性能分词
+安装 **Node.js**（>= 18）和 **npm**：
 
-## 系统要求
+- 官网下载：https://nodejs.org/
+- 验证安装：`node --version` → 应显示 v18.x 或更高
+- 验证安装：`npm --version` → 应显示 9.x 或更高
 
-- Windows 7/8/10/11
-- [Bun](https://bun.sh/) 运行时
-- Python 3.8+（可选，用于GUI界面）
+## 安装依赖
 
-## 安装
-
-### 1. 安装Bun
-
-```powershell
-powershell -Command "irm bun.sh/install.ps1 | iex"
-```
-
-### 2. 安装依赖
+将项目下载到本地后（`node_modules/` 不包含在仓库中），在项目根目录执行：
 
 ```bash
-bun install
+npm install
 ```
 
-### 3. 复制日语词典（可选）
+此命令会读取 `package.json`，自动下载以下包到 `node_modules/`：
+
+### 运行时依赖（dependencies）
+
+| 包名 | 版本 | 作用 | 安装后位置 |
+|------|------|------|-----------|
+| `kuroshiro` | ^1.2.0 | 日文汉字转振假名的核心引擎。接收日文字符串，返回带假名标注的 ruby HTML | `node_modules/kuroshiro/` |
+| `kuroshiro-analyzer-kuromoji` | ^1.1.0 | kuroshiro 的分析器插件，负责日文分词和读音提取 | `node_modules/kuroshiro-analyzer-kuromoji/` |
+
+kuroshiro-analyzer-kuromoji 内部依赖 **kuromoji.js**（日文形态素分析器，Java Kuromoji 的 JS 移植版），后者自带离线词典数据，位于：
+
+```
+node_modules/kuromoji/dict/
+├── base.dat.gz
+├── cc.dat.gz
+├── check.dat.gz
+├── tid.dat.gz
+├── tid_map.dat.gz
+├── tid_pos.dat.gz
+├── unk.dat.gz
+├── unk_char.dat.gz
+├── unk_compat.dat.gz
+└── unk_invoke.dat.gz
+```
+
+所有词典文件随 npm 包一起安装，**无需联网**即可离线运行。
+
+### 开发依赖（devDependencies）
+
+| 包名 | 版本 | 作用 | 安装后位置 |
+|------|------|------|-----------|
+| `electron` | ^42.0.1 | 桌面 GUI 框架。提供 Chromium 渲染 + Node.js 运行时，用于开发运行 `.` 和打包为独立应用 | `node_modules/electron/`（内含 `dist/electron` 二进制） |
+| `electron-builder` | ^26.0.0 | 打包构建工具。将项目与 Electron 打包为 exe / AppImage / deb 等分发格式 | `node_modules/electron-builder/` |
+
+### npm install 执行过程
+
+1. npm 读取 `package.json` 中的 `dependencies` 和 `devDependencies`
+2. 下载所有包到 `node_modules/`
+3. Electron 的 postinstall 脚本自动下载对应平台（win/linux/mac）的 Electron 二进制文件到 `node_modules/electron/dist/`
+4. 安装完成后目录结构如下：
+
+```
+ass-rs/
+├── node_modules/          # 所有依赖（已加入 .gitignore，不上传 GitHub）
+│   ├── electron/          # Electron 框架 + 二进制
+│   ├── electron-builder/  # 打包工具
+│   ├── kuroshiro/         # 日文转换引擎
+│   ├── kuroshiro-analyzer-kuromoji/
+│   ├── kuromoji/          # 日文形态素分析器 + 词典
+│   └── ...                # 间接依赖
+├── main.js
+├── preload.cjs
+├── renderer/
+│   ├── index.html
+│   ├── style.css
+│   └── renderer.js
+└── package.json
+```
+
+### 注意事项
+
+- **首次安装 Electron 较慢**（~120MB 二进制下载），视网络情况可能需要几分钟
+- 中国大陆用户可设置镜像加速：`export ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"`
+- `node_modules/` **不要提交到 GitHub**（已在 `.gitignore` 中忽略）
+- 如需在另一台机器上运行，只需重新执行 `npm install`
+
+## 运行
 
 ```bash
-mkdir dict
-cp node_modules/kuromoji/dict/*.dat.gz dict/
+npm start
 ```
 
-## 使用方法
+## 构建
 
-### 图形界面（推荐）
+### Windows 单文件 exe
+
+需要 Windows 系统或 Linux + wine64：
 
 ```bash
-python test.py
+npx electron-builder --win portable
 ```
 
-然后：
-1. 点击"文件选择"按钮
-2. 选择SRT字幕文件
-3. 点击"开始转换"
-4. 生成的ASS文件会在同一目录
+输出：`dist/日语振假名生成器 2.0.0.exe`
 
-### 命令行
+### Linux AppImage
 
 ```bash
-python cli.py input.srt output.ass
+npx electron-builder --linux appimage
 ```
 
-## 项目结构
+输出：`dist/日语振假名生成器-2.0.0.AppImage`
 
-```
-.
-├── test.py              # Python GUI主程序
-├── cli.py               # 命令行版本
-├── kuroshiro.mjs        # Bun日语分词程序
-├── package.json         # Bun项目配置
-├── dict/                # 日语词典数据（必需）
-│   ├── base.dat.gz
-│   ├── tid.dat.gz
-│   └── ...
-└── src/
-    └── user_vocab.json  # 用户自定义词典
-```
-
-## 打包为独立exe
-
-### 1. 编译kuroshiro.mjs
+### Linux deb
 
 ```bash
-bun build --compile kuroshiro.mjs --outfile kuroshiro.exe
+npx electron-builder --linux deb
 ```
 
-### 2. 打包Python程序
+输出：`dist/ass-rs_2.0.0_amd64.deb`
 
-```bash
-pip install pyinstaller
-python build_exe_v2.py
-```
+## 使用
 
-### 3. 分发
+1. 打开程序，点击「文件选择」选取 `.srt` 字幕文件
+2. 点击「开始转换」
+3. 同目录下生成 `.ass` 文件
 
-`dist/日语振假名生成器/` 文件夹包含：
-- `日语振假名生成器.exe` - 主程序
-- `kuroshiro.exe` - 分词引擎
-- `dict/` - 日语词典
-- `src/` - 用户词典
-
-## 注意事项
-
-- 词典文件 `dict/*.dat.gz` 必须存在
-- 运行时需要约200MB内存
-- 首次运行可能需要几秒钟加载词典
-
-## 许可证
-
-MIT
-
-## 致谢
-
-- [kuromoji](https://github.com/takuyaa/kuromoji.js) - 日语分词库
-- [kuroshiro](https://github.com/hexenq/kuroshiro) - 日语转换库
-- [Bun](https://bun.sh/) - JavaScript运行时
+生成的 ASS 文件包含两条 Aegisub 模板注释行，可在 Aegisub 中执行卡拉 OK 模板渲染振假名。

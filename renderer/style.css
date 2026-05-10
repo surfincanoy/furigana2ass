@@ -15,8 +15,26 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px 0;
+  padding: 20px 20px 0;
   height: 100vh;
+}
+
+.section {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 10px;
+  padding-left: 2px;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background: #444;
+  margin: 16px 0;
 }
 
 .input-row {
@@ -24,6 +42,7 @@ body {
   width: 100%;
   gap: 8px;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .srt-input {
@@ -66,7 +85,8 @@ body {
 
 .btn-convert {
   width: 120px;
-  margin-top: 16px;
+  display: block;
+  margin: 12px auto 0;
   background: #3a7ebf;
   color: #fff;
   font-size: 14px;
@@ -81,9 +101,27 @@ body {
   cursor: not-allowed;
 }
 
+.btn-merge {
+  width: 120px;
+  display: block;
+  margin: 12px auto 0;
+  background: #6a8f3a;
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn-merge:hover {
+  background: #7aa04a;
+}
+
+.btn-merge:disabled {
+  background: #565656;
+  cursor: not-allowed;
+}
+
 .status-area {
   width: 100%;
-  margin-top: 14px;
+  margin-top: 10px;
   padding: 8px;
   background: #1e1e1e;
   border-radius: 4px;
@@ -106,6 +144,24 @@ body {
 
 .status-area.progress {
   color: #6a9fd4;
+}
+
+.options-row {
+  width: 100%;
+  margin-top: 2px;
+}
+
+.checkbox-label {
+  font-size: 12px;
+  color: #bbb;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: #6a8f3a;
 }
 
 .footer {

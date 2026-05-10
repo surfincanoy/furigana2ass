@@ -9,16 +9,45 @@
 </head>
 <body>
   <div class="container">
-    <div class="input-row">
-      <input type="text" id="srtPath" class="srt-input" placeholder="请选择SRT文件" readonly>
-      <button id="selectBtn" class="btn btn-select">文件选择</button>
+    <div class="section">
+      <div class="section-title">注音转换</div>
+      <div class="input-row">
+        <input type="text" id="srtPath" class="srt-input" placeholder="请选择字幕文件（SRT/ASS）" readonly>
+        <button id="selectBtn" class="btn btn-select">浏览</button>
+      </div>
+
+      <div class="status-area" id="statusArea">
+        <span id="statusText">就绪</span>
+      </div>
+
+      <button id="convertBtn" class="btn btn-convert">开始转换</button>
     </div>
 
-    <div class="status-area" id="statusArea">
-      <span id="statusText">就绪</span>
-    </div>
+    <div class="separator"></div>
 
-    <button id="convertBtn" class="btn btn-convert">开始转换</button>
+    <div class="section">
+      <div class="section-title">双语字幕合并</div>
+      <div class="input-row">
+        <input type="text" id="mergeFile1" class="srt-input" placeholder="选择第一个字幕文件（如中文，支持 SRT/ASS）" readonly>
+        <button id="mergeSelect1" class="btn btn-select">浏览</button>
+      </div>
+      <div class="input-row">
+        <input type="text" id="mergeFile2" class="srt-input" placeholder="选择第二个字幕文件（如英文，支持 SRT/ASS）" readonly>
+        <button id="mergeSelect2" class="btn btn-select">浏览</button>
+      </div>
+
+      <div class="options-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mergeSwap"> 翻转显示语言（第一个字幕文件语言在上方显示，否则勾选此项）
+        </label>
+      </div>
+
+      <div class="status-area" id="mergeStatus">
+        <span id="mergeStatusText">就绪</span>
+      </div>
+
+      <button id="mergeBtn" class="btn btn-merge">合并字幕</button>
+    </div>
 
     <div class="footer">
       <span class="author">作者B站：水橙汁</span>

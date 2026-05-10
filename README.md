@@ -4,11 +4,8 @@ Electron 桌面工具，提供两个功能：
 - **注音转换**：将 SRT/ASS 字幕转换为 ASS 格式，自动为日文汉字标注振假名（furigana），生成 Aegisub 卡拉 OK 模板
 - **双语合并**：将两个字幕文件按行合并为双语字幕（如中文 + 英文）
 
-<div style="border-left: 4px solid #ffa500; background: #2d2d2d; padding: 10px 16px; color: #ffcc66;">
-
-**注意**：本程序不保证振假名的正确性，如需要更改字幕文本，比如字体大小，纠正振假名错误等，请在应用卡拉 OK 模板前更改。
-
-</div>
+> [!WARNING]
+> 如需要更改字幕文本，比如字体大小，纠正振假名错误等，请在应用卡拉 OK 模板前更改。
 
 ## 前置要求
 
